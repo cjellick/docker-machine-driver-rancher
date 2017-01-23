@@ -1,4 +1,4 @@
-.PHONY : build dist dist-clean fmt release tag-release deps vet test
+.PHONY : build dist dist-clean fmt vet test
 
 NAME=docker-machine-driver-rancher
 VERSION := $(shell cat VERSION)
@@ -15,7 +15,7 @@ all: build
 
 build:
 	mkdir -p build
-	go build -a -ldflags "$(LDFLAGS)" -o build/$(NAME) ./bin
+	go build -a -ldflags "$(LDFLAGS)" -o build/$(NAME)
 
 dist-clean:
 	rm -rf dist
@@ -24,28 +24,18 @@ dist-clean:
 dist: dist-clean
 	mkdir -p release
 	mkdir -p dist
-	mkdir -p dist/linux/amd64 && GOOS=linux GOARCH=amd64 go build -a -ldflags "$(LDFLAGS)" -o dist/linux/amd64/$(NAME) ./bin
-	mkdir -p dist/linux/armhf && GOOS=linux GOARCH=arm GOARM=6 go build -a -ldflags "$(LDFLAGS)" -o dist/linux/armhf/$(NAME) ./bin
-	mkdir -p dist/darwin/amd64 && GOOS=darwin GOARCH=amd64 go build -a -ldflags "$(LDFLAGS)" -o dist/darwin/amd64/$(NAME) ./bin
-#	mkdir -p dist/windows/amd64 && CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -a -ldflags "$(LDFLAGS)" -o dist/windows/amd64/$(NAME).exe ./bin
+	mkdir -p dist/linux/amd64 && GOOS=linux GOARCH=amd64 go build -a -ldflags "$(LDFLAGS)" -o dist/linux/amd64/$(NAME)
+	mkdir -p dist/linux/amd64 && GOOS=linux GOARCH=amd64 go build -a -ldflags "$(LDFLAGS)" -o dist/linux/amd64/$(NAME)
+	mkdir -p dist/linux/armhf && GOOS=linux GOARCH=arm GOARM=6 go build -a -ldflags "$(LDFLAGS)" -o dist/linux/armhf/$(NAME)
+	mkdir -p dist/darwin/amd64 && GOOS=darwin GOARCH=amd64 go build -a -ldflags "$(LDFLAGS)" -o dist/darwin/amd64/$(NAME)
 	tar -cvzf release/$(NAME)-$(VERSION)-linux-amd64.tar.gz -C dist/linux/amd64 $(NAME)
-	cd $(shell pwd)/release && md5 $(NAME)-$(VERSION)-linux-amd64.tar.gz > $(NAME)-$(VERSION)-linux-amd64.tar.gz.md5
+	cd $(shell pwd)/release && md5sum $(NAME)-$(VERSION)-linux-amd64.tar.gz > $(NAME)-$(VERSION)-linux-amd64.tar.gz.md5
+	tar -cvzf release/$(NAME)-$(VERSION)-linux-amd64.tar.gz -C dist/linux/amd64 $(NAME)
+	cd $(shell pwd)/release && md5sum $(NAME)-$(VERSION)-linux-amd64.tar.gz > $(NAME)-$(VERSION)-linux-amd64.tar.gz.md5
 	tar -cvzf release/$(NAME)-$(VERSION)-linux-armhf.tar.gz -C dist/linux/armhf $(NAME)
-	cd $(shell pwd)/release && md5 $(NAME)-$(VERSION)-linux-armhf.tar.gz > $(NAME)-$(VERSION)-linux-armhf.tar.gz.md5
+	cd $(shell pwd)/release && md5sum $(NAME)-$(VERSION)-linux-armhf.tar.gz > $(NAME)-$(VERSION)-linux-armhf.tar.gz.md5
 	tar -cvzf release/$(NAME)-$(VERSION)-darwin-amd64.tar.gz -C dist/darwin/amd64 $(NAME)
-	cd $(shell pwd)/release && md5 $(NAME)-$(VERSION)-darwin-amd64.tar.gz > $(NAME)-$(VERSION)-darwin-amd64.tar.gz.md5
-#	tar -cvzf release/$(NAME)-$(VERSION)-windows-amd64.tar.gz -C dist/windows/amd64 $(NAME).exe
-#	cd $(shell pwd)/release && md5 $(NAME)-$(VERSION)-windows-amd64.tar.gz > $(NAME)-$(VERSION)-windows-amd64.tar.gz.md5
-
-release: dist
-	ghr -u vincent99 -r docker-machine-driver-rancher --replace $(VERSION) release/
-
-tag-release:
-	git tag -f `cat VERSION`
-	git push -f origin master --tags
-
-deps:
-	go get -u github.com/tcnksm/ghr
+	cd $(shell pwd)/release && md5sum $(NAME)-$(VERSION)-darwin-amd64.tar.gz > $(NAME)-$(VERSION)-darwin-amd64.tar.gz.md5
 
 vet:
 	@if [ -n "$(shell gofmt -l .)" ]; then \

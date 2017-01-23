@@ -11,3 +11,5 @@ import:
     version: master
   - package: github.com/Azure/go-ansiterm/winterm
     version: fa152c58bc15761d0200cb75fe958b89a9d4888e
+  - package: github.com/gorilla/websocket
+    version: 2257eda00b2084c1351cd672aa5476daa9f5e463
